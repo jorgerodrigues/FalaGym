@@ -3,11 +3,7 @@ import { calculateNewEaseFactor } from "./calculateEaseFactor";
 import { calculateNextDueDate } from "./calculateNextDueDate";
 import { calculateNextInterval } from "./calculateNextInterval";
 
-export const processCardReview = (
-  card: Card,
-  rating: number,
-  currentTime: number
-) => {
+export const processCardReview = (card: Card, rating: number) => {
   const isSuccessful = rating >= 3;
   const newRepetitions = isSuccessful ? card.repetitions + 1 : 0;
   const newEaseFactor = calculateNewEaseFactor(card.easeFactor, rating);
@@ -28,6 +24,6 @@ export const processCardReview = (
     interval: newInterval,
     newDueDate: newDueDate,
     repetitions: newRepetitions,
-    lastReviewedAt: currentTime,
+    lastReviewedAt: new Date(),
   };
 };

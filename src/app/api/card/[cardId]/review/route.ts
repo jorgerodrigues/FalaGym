@@ -56,13 +56,7 @@ export const POST = async (req: Request, params: { params: Params }) => {
     });
 
     // re-calculate next review date
-    // For now we are hardcoding two days from now
-    const nextReviewDate = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
-    const updatedCard = card.processCardReview(
-      cardExists,
-      Number(body.rating),
-      nextReviewDate.getTime()
-    );
+    const updatedCard = card.processCardReview(cardExists, Number(body.rating));
 
     await prisma.card.update({
       where: {
