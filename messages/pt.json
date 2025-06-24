@@ -14,7 +14,7 @@
   },
   "sentence": {
     "skip": "Pular",
-    "show-answer": "Mostrar resposta",
+    "show-answer": "Resposta",
     "wrong": "Errado",
     "right": "Correto"
   }
