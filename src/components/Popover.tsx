@@ -1,6 +1,7 @@
 "use client";
 import * as RadixPopover from "@radix-ui/react-popover";
 import React, { ReactNode } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export type PopoverOption = {
   id: string;
@@ -44,6 +45,17 @@ export const Popover: React.FC<PopoverProps> = ({
   shadow = true,
   border = true,
 }) => {
+  // Internal state for controlled/uncontrolled behavior
+  const [internalOpen, setInternalOpen] = React.useState(false);
+
+  // Use controlled state if provided, otherwise use internal state
+  const isOpen = open !== undefined ? open : internalOpen;
+  const handleOpenChange = (newOpen: boolean) => {
+    if (open === undefined) {
+      setInternalOpen(newOpen);
+    }
+    onOpenChange?.(newOpen);
+  };
   // Width classes mapping
   const widthClasses = {
     auto: "w-auto",
@@ -72,15 +84,21 @@ export const Popover: React.FC<PopoverProps> = ({
   const renderOptionsContent = () => {
     if (!options || options.length === 0) return null;
 
+    const itemBaseClasses = ["focus:ring-slate-200"].join(" ");
     return (
       <>
         {title && <PopoverHeading>{title}</PopoverHeading>}
         {options.map((option) => (
           <PopoverItem
             key={option.id}
-            onClick={option.onClick}
+            onClick={() => {
+              if (!option.disabled) {
+                option.onClick();
+                handleOpenChange(false);
+              }
+            }}
             disabled={option.disabled}
-            className={option.className}
+            className={itemBaseClasses + " " + (option.className || "")}
           >
             {typeof option.item === "string" ? (
               <span>{option.item}</span>
@@ -94,31 +112,46 @@ export const Popover: React.FC<PopoverProps> = ({
   };
 
   return (
-    <RadixPopover.Root open={open} onOpenChange={onOpenChange}>
+    <RadixPopover.Root open={isOpen} onOpenChange={handleOpenChange}>
       <RadixPopover.Trigger asChild>
         {/* Using a span instead of div for better inline behavior */}
         <span className="inline-block">{trigger}</span>
       </RadixPopover.Trigger>
 
       {/* Content that appears next to the trigger */}
-      <RadixPopover.Portal>
-        <RadixPopover.Content
-          className={contentBaseClasses}
-          align={align}
-          side={side}
-          sideOffset={10}
-          avoidCollisions
-        >
-          {showArrow && (
-            <RadixPopover.Arrow
-              className="fill-white/80 stroke-border-default stroke-1"
-              width={12}
-              height={7}
-            />
-          )}
-          {options ? renderOptionsContent() : children}
-        </RadixPopover.Content>
-      </RadixPopover.Portal>
+      <AnimatePresence>
+        {isOpen && (
+          <RadixPopover.Portal forceMount>
+            <RadixPopover.Content
+              className={contentBaseClasses}
+              align={align}
+              side={side}
+              sideOffset={10}
+              avoidCollisions
+              asChild
+            >
+              <motion.div
+                initial={{ opacity: 0.4, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{
+                  duration: 0.2,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+              >
+                {showArrow && (
+                  <RadixPopover.Arrow
+                    className="fill-white/80 stroke-border-default stroke-1"
+                    width={12}
+                    height={7}
+                  />
+                )}
+                {options ? renderOptionsContent() : children}
+              </motion.div>
+            </RadixPopover.Content>
+          </RadixPopover.Portal>
+        )}
+      </AnimatePresence>
     </RadixPopover.Root>
   );
 };
@@ -168,11 +201,33 @@ export const PopoverItem = ({
     className,
   ].join(" ");
 
+  const handleInteraction = React.useCallback(
+    (e?: React.MouseEvent | React.KeyboardEvent | React.TouchEvent) => {
+      if (!disabled && onClick) {
+        e?.preventDefault();
+        onClick();
+      }
+    },
+    [disabled, onClick]
+  );
+
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        handleInteraction(e);
+      }
+    },
+    [handleInteraction]
+  );
+
   return (
     <div
       className={combinedClasses}
-      onClick={disabled ? undefined : onClick}
+      onClick={disabled ? undefined : handleInteraction}
+      onKeyDown={disabled ? undefined : handleKeyDown}
       role={onClick ? "button" : undefined}
+      tabIndex={onClick && !disabled ? 0 : undefined}
+      aria-disabled={disabled}
     >
       {children}
     </div>
