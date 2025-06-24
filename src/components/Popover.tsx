@@ -80,7 +80,6 @@ export const Popover: React.FC<PopoverProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  // Generate options content if options array is provided
   const renderOptionsContent = () => {
     if (!options || options.length === 0) return null;
 
@@ -114,11 +113,9 @@ export const Popover: React.FC<PopoverProps> = ({
   return (
     <RadixPopover.Root open={isOpen} onOpenChange={handleOpenChange}>
       <RadixPopover.Trigger asChild>
-        {/* Using a span instead of div for better inline behavior */}
         <span className="inline-block">{trigger}</span>
       </RadixPopover.Trigger>
 
-      {/* Content that appears next to the trigger */}
       <AnimatePresence>
         {isOpen && (
           <RadixPopover.Portal forceMount>
@@ -156,7 +153,6 @@ export const Popover: React.FC<PopoverProps> = ({
   );
 };
 
-// Convenient sub-components to structure content
 export const PopoverHeading = ({
   children,
   className = "",

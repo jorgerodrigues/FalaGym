@@ -48,8 +48,6 @@ export const ProfileButton: React.FC<ProfileButtonProps> = ({ session }) => {
     },
   ];
 
-  // function for determining if we are on mobile or larger screens
-
   return (
     <Popover
       trigger={<Trigger />}
