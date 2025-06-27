@@ -12,6 +12,7 @@ import { useUser } from "@/providers/LoggedUserProvider";
 import { useTranslations } from "next-intl";
 
 export default function Page() {
+  const t = useTranslations("sentence");
   const [showDefinition, setShowDefinition] = useState(false);
   const [selectedSentenceIdx, setSelectedSentenceIdx] = useState(0);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -134,8 +135,6 @@ export default function Page() {
           <AnimatePresence mode={"wait"}>
             {showDefinition && (
               <Definition
-                onWrong={handleWrong}
-                onRight={handleRight}
                 sentenceDefinition={selectedSentence?.translation ?? ""}
                 words={selectedSentence?.definitions ?? []}
               />
@@ -143,9 +142,51 @@ export default function Page() {
           </AnimatePresence>
         </div>
       )}
+      <div
+        className={
+          "absolute bottom-0 left-0 right-0 mx-auto rounded-sm backdrop-blur-xl bg-white/10 w-full  p-xSmall md:max-w-[600px] xl:max-w-[850px]"
+        }
+      >
+        <SentenceButtons
+          skipLabel={showDefinition ? t("wrong") : t("skip")}
+          confirmLabel={showDefinition ? t("right") : t("show-answer")}
+          onConfirm={showDefinition ? handleRight : handleShowAnswer}
+          onSkip={showDefinition ? handleWrong : handleSkip}
+        />
+      </div>
     </motion.div>
   );
 }
+
+const SentenceButtons = ({
+  onSkip,
+  onConfirm,
+  skipLabel,
+  confirmLabel,
+}: {
+  confirmLabel: string;
+  skipLabel: string;
+  onSkip: () => void;
+  onConfirm: () => void;
+}) => {
+  return (
+    <motion.div
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      initial={{ opacity: 0 }}
+      transition={{ duration: 0.3, delay: 0.5 }}
+      className={"flex w-full justify-between px-large"}
+      style={{ width: "100%" }}
+    >
+      <Button variant="secondary" onClick={onSkip}>
+        {skipLabel}
+      </Button>
+      <Button variant="primary" onClick={onConfirm}>
+        {confirmLabel}
+      </Button>
+    </motion.div>
+  );
+};
 
 type SentenceProps = {
   content: string;
@@ -154,14 +195,8 @@ type SentenceProps = {
   onShowAnswer: () => void;
 };
 
-const Sentence: React.FC<SentenceProps> = ({
-  content,
-  onSkip,
-  onShowAnswer,
-  answerDisplayed,
-}) => {
+const Sentence: React.FC<SentenceProps> = ({ content, answerDisplayed }) => {
   const contentValue = useAnimatedText(content);
-  const t = useTranslations("sentence");
 
   const textVariants = {
     large: {
@@ -194,23 +229,6 @@ const Sentence: React.FC<SentenceProps> = ({
       >
         {contentValue}
       </motion.p>
-      {!answerDisplayed && (
-        <motion.div
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          initial={{ opacity: 0 }}
-          transition={{ duration: 0.3, delay: 0.5 }}
-          className={"flex w-full justify-between"}
-          style={{ width: "100%" }}
-        >
-          <Button variant="secondary" onClick={onSkip}>
-            {t("skip")}
-          </Button>
-          <Button variant="primary" onClick={onShowAnswer}>
-            {t("show-answer")}
-          </Button>
-        </motion.div>
-      )}
     </motion.div>
   );
 };
@@ -218,8 +236,6 @@ const Sentence: React.FC<SentenceProps> = ({
 type DefinitionProps = {
   sentenceDefinition: string;
   words: Array<WordDefinition>;
-  onWrong: () => void;
-  onRight: () => void;
 };
 
 type WordDefinition = {
@@ -230,11 +246,7 @@ type WordDefinition = {
 const Definition: React.FC<DefinitionProps> = ({
   sentenceDefinition,
   words,
-  onWrong,
-  onRight,
 }) => {
-  const t = useTranslations("sentence");
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -267,14 +279,6 @@ const Definition: React.FC<DefinitionProps> = ({
           })}
         </div>
       </Card>
-      <div className={"flex w-full justify-between"}>
-        <Button variant="secondary" onClick={onWrong}>
-          {t("wrong")}
-        </Button>
-        <Button variant="primary" onClick={onRight}>
-          {t("right")}
-        </Button>
-      </div>
     </motion.div>
   );
 };
