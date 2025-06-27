@@ -163,6 +163,17 @@ const Sentence: React.FC<SentenceProps> = ({
   const contentValue = useAnimatedText(content);
   const t = useTranslations("sentence");
 
+  const textVariants = {
+    large: {
+      fontSize: "1.875rem", // text-3xl
+      transition: { duration: 0.3, ease: "easeInOut" },
+    },
+    small: {
+      fontSize: "1.125rem", // text-lg
+      transition: { duration: 0.3, ease: "easeInOut" },
+    },
+  };
+
   return (
     <motion.div
       layout={"position"}
@@ -171,8 +182,11 @@ const Sentence: React.FC<SentenceProps> = ({
     >
       <motion.p
         layout={"position"}
+        variants={textVariants}
+        initial="large"
+        animate={answerDisplayed ? "small" : "large"}
         className={
-          "w-full max-h-[75dvh] text-3xl text-center leading-tight font-medium text-text-dark text-pretty"
+          "w-full max-h-[75dvh] text-center leading-tight font-medium text-text-dark text-pretty"
         }
         style={{ width: "100%", minWidth: "100%" }}
       >
