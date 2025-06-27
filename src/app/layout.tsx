@@ -62,18 +62,18 @@ export default async function RootLayout({
   return (
     <html lang={lang}>
       <body
-        className={`${lexend.variable} ${dmMono.variable} relative antialiased font-sans bg-bg-default min-h-[100dvh] `}
+        className={`${lexend.variable} ${dmMono.variable} relative antialiased font-sans bg-bg-default min-h-[90dvh] `}
       >
         {/* top brand color bar */}
         <div className={"h-[6px] w-full absolute top-0 bg-control-cta"} />
-        <div className={"p-large overflow-auto"}>
+        <div className={"lg:p-large overflow-auto"}>
           <ReactQueryProvider>
             <LoggedUserProvider userId={session?.user?.id ?? ""}>
               <PostHogProvider>
                 <NextIntlClientProvider>
                   <div
                     className={
-                      "my-xLarge md:my-0 md:mr-xLarge md:px-xxLarge h-[100%] min-h-[80dvh]"
+                      "my-xLarge md:my-0 lg:mr-xLarge lg:px-xxLarge h-[100%] min-h-[80dvh]"
                     }
                   >
                     {children}
