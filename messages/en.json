@@ -5,8 +5,8 @@
   },
   "dash": {
     "button-practice-now": "Practice now",
-    "start-practicing": "Start your practive right now. Let's improve your {language}",
-    "start-practicing-description": "Start practicing right now. Let's improve your {language}"
+    "start-practicing": "Practice {language} now.",
+    "start-practicing-description": "Put some reps in right now. Let's improve your {language}"
   },
   "onboarding": {
     "which-language-learn": "Which one language would you like to practice?",
