@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { useUser } from "@/providers/LoggedUserProvider";
 import { useTranslations } from "next-intl";
+import colors from "tailwindcss/colors";
 
 export default function Page() {
   const [showDefinition, setShowDefinition] = useState(false);
@@ -114,14 +115,14 @@ export default function Page() {
 
   return (
     <motion.div
-      className={`flex flex-col w-full items-center justify-center h-full md:min-h-[80vh] p-large`}
+      className={`flex flex-col w-full items-center justify-center h-full md:min-h-[80vh] p-small lg:p-large`}
       layout={"position"}
     >
       {selectedSentence && (
         <div
           key={selectedSentence.id ?? "loading"}
           className={
-            "flex flex-col md:max-w-[600px] xl:max-w-[850px] gap-xLarge w-full"
+            "flex flex-col md:max-w-[600px] xl:max-w-[850px] gap-xLarge w-full py-large"
           }
           style={{ width: "100%" }}
         >
@@ -165,11 +166,13 @@ const Sentence: React.FC<SentenceProps> = ({
 
   const textVariants = {
     large: {
-      fontSize: "1.875rem", // text-3xl
+      fontSize: "1.5rem", // text-3xl
+      fontWeight: "400",
       transition: { duration: 0.3, ease: "easeInOut" },
     },
     small: {
-      fontSize: "1.125rem", // text-lg
+      fontSize: "1rem", // text-lg
+      fontWeight: "300",
       transition: { duration: 0.3, ease: "easeInOut" },
     },
   };
@@ -186,7 +189,7 @@ const Sentence: React.FC<SentenceProps> = ({
         initial="large"
         animate={answerDisplayed ? "small" : "large"}
         className={
-          "w-full max-h-[75dvh] text-center leading-tight font-medium text-text-dark text-pretty"
+          "w-full max-h-[75dvh] text-center text-text-dark text-pretty"
         }
         style={{ width: "100%", minWidth: "100%" }}
       >
@@ -247,7 +250,7 @@ const Definition: React.FC<DefinitionProps> = ({
       >
         <p
           className={
-            "text-large font-medium wrap-pretty md:max-w-[600px] w-full text-center"
+            "text-lg font-medium wrap-pretty md:max-w-[600px] w-full text-center"
           }
         >
           {sentenceDefinition}

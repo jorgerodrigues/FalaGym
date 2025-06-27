@@ -45,7 +45,6 @@ export default {
           default: colors.slate[200],
         },
       },
-      // Custom spacing for our larger gaps while keeping Tailwind defaults
       spacing: {
         xSmall: "4px",
         small: "16px",
