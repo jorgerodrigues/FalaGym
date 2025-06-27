@@ -10,7 +10,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { useUser } from "@/providers/LoggedUserProvider";
 import { useTranslations } from "next-intl";
-import colors from "tailwindcss/colors";
 
 export default function Page() {
   const [showDefinition, setShowDefinition] = useState(false);
