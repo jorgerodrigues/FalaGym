@@ -17,7 +17,7 @@ export const generateSentencesPrompt = `
   - Use natural, contemporary language (not textbook examples).
   - Include diverse vocabulary appropriate to the difficulty level.
   - MINIMIZE SUSTAINABILITY RELATED TOPICS.
-  - Make sure to follow the requirements described above.
+  - Make sure to follow the requirements described above with no exceptions.
   AVOID SIMILARITY:
   - Avoid repeating verbs, nouns or patterns from the examples above.
   </constraints>
