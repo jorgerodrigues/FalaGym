@@ -4,6 +4,7 @@ import { SentenceDataArraySchema } from "@/types/schemas/sentence";
 import { loadPromptFromConstant } from "@/utils/prompt-loader";
 import { anthropic } from "@ai-sdk/anthropic";
 import { generateObject } from "ai";
+import { generateAudioForSentence } from "../sentence/generateAudioForSentence";
 
 const possibleStructures = [
   "Questions",
@@ -127,7 +128,7 @@ export const generateCardsForUser = async (
   });
 
   for (const sentence of object.sentences) {
-    await prisma.sentence.create({
+    const s = await prisma.sentence.create({
       data: {
         content: sentence.sentence,
         translation: sentence.translation,
@@ -154,6 +155,14 @@ export const generateCardsForUser = async (
         },
       },
     });
+
+    if (s.language && s.content) {
+      await generateAudioForSentence({
+        id: s.id,
+        sentence: s.content,
+        language: s.language,
+      });
+    }
   }
   return object;
 };

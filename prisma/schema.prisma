@@ -41,6 +41,7 @@ model Sentence {
   userId         String?
   language       String?
   nativeLanguage String?
+  audioUrl       String?
 
   words Word[]
   Card  Card[]
@@ -82,7 +83,7 @@ model Card {
 model CardReviewLog {
   id         String   @id @unique @default(uuid())
   reviewDate DateTime @default(now())
-  rating     Int      @default(0) // rating 0 or 5
+  rating     Int      @default(0) // rating 0, 3 or 5
 
   card   Card   @relation(fields: [cardId], references: [id])
   cardId String
@@ -97,11 +98,12 @@ model CardReviewLog {
 }
 
 model Word {
-  id             String @id @unique @default(uuid())
+  id             String  @id @unique @default(uuid())
   word           String
   definition     String
   language       String
-  nativeLanguage String @default("en")
+  nativeLanguage String  @default("en")
+  audioUrl       String?
 
   Sentence   Sentence? @relation(fields: [sentenceId], references: [id])
   sentenceId String?
