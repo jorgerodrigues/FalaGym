@@ -11,10 +11,10 @@ export default {
   theme: {
     extend: {
       fontSize: {
-        caption: ["12px", { lineHeight: "18px", fontWeight: "300" }],
-        base: ["16px", { lineHeight: "24px", fontWeight: "300" }],
-        large: ["24px", { lineHeight: "36px", fontWeight: "600" }],
-        number: ["32px", { lineHeight: "48px", fontWeight: "400" }],
+        caption: ["12px", { lineHeight: "16px", fontWeight: "300" }],
+        base: ["14px", { lineHeight: "22px", fontWeight: "300" }],
+        large: ["22px", { lineHeight: "34px", fontWeight: "600" }],
+        number: ["30px", { lineHeight: "42px", fontWeight: "400" }],
         ["base-bold"]: ["16px", { lineHeight: "24px", fontWeight: "500" }],
       },
       fontFamily: {
