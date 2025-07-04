@@ -206,7 +206,7 @@ export const AccordionItem: React.FC<AccordionItemInternalProps> = ({
       onClick={handleToggle}
     >
       {/* Header */}
-      <div className={headerStyles}>
+      <div className={headerStyles} id={`accordion-header-${itemIndex}`}>
         <div className="flex-1 text-left">
           {typeof title === "string" ? (
             <span className="text-base font-medium text-text-dark capitalize">
