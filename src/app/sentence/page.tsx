@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/Button";
-import { Card } from "@/components/Card";
 import { useAnimatedText } from "@/hooks/useAnimatedText";
 import { apiFetcher } from "@/lib/api/apiFetcher";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -10,6 +9,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { useUser } from "@/providers/LoggedUserProvider";
 import { useTranslations } from "next-intl";
+import { Accordion, AccordionItem } from "@/components/Accordion";
 
 export default function Page() {
   const t = useTranslations("sentence");
@@ -115,7 +115,7 @@ export default function Page() {
 
   return (
     <motion.div
-      className={`flex flex-col w-full items-center justify-center h-full md:min-h-[80vh] p-small lg:p-large`}
+      className={`relative flex flex-col w-full items-center justify-center h-full min-h-[80vh] p-small lg:p-large`}
       layout={"position"}
     >
       {selectedSentence && (
@@ -144,7 +144,7 @@ export default function Page() {
       )}
       <div
         className={
-          "absolute bottom-0 left-0 right-0 mx-auto rounded-sm backdrop-blur-xl bg-white/10 w-full  p-xSmall md:max-w-[600px] xl:max-w-[850px]"
+          "fixed bottom-large left-0 right-0 mx-auto w-full md:max-w-[600px] xl:max-w-[850px]"
         }
       >
         <SentenceButtons
@@ -175,7 +175,7 @@ const SentenceButtons = ({
       exit={{ opacity: 0 }}
       initial={{ opacity: 0 }}
       transition={{ duration: 0.3, delay: 0.5 }}
-      className={"flex w-full justify-between px-large"}
+      className={"flex w-full justify-between px-small"}
       style={{ width: "100%" }}
     >
       <Button variant="secondary" onClick={onSkip}>
@@ -254,9 +254,9 @@ const Definition: React.FC<DefinitionProps> = ({
       animate={{ opacity: 1 }}
       className={"flex flex-col item-center justify-center gap-large w-full"}
     >
-      <Card
+      <div
         className={
-          "flex items-center w-full gap-large max-h-[50dvh] md:max-h-[90dvh]"
+          "flex flex-col items-center w-full gap-large h-full overflow-scroll"
         }
       >
         <p
@@ -267,18 +267,21 @@ const Definition: React.FC<DefinitionProps> = ({
           {sentenceDefinition}
         </p>
         <div
-          className={"flex flex-col w-full gap-small h-full overflow-y-scroll"}
+          className={
+            "flex flex-col w-full gap-small h-full overflow-y-scroll p-xSmall"
+          }
         >
-          {words.map((w) => {
-            return (
-              <div key={w.word} className={"flex flex-col"}>
-                <p className={"font-medium capitalize"}>{w.word}: </p>
-                <p>{w.definition}</p>
-              </div>
-            );
-          })}
+          <Accordion spacing="none" defaultOpen={[0]}>
+            {words.map((w) => {
+              return (
+                <AccordionItem key={w.word} title={w.word}>
+                  <p>{w.definition}</p>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
         </div>
-      </Card>
+      </div>
     </motion.div>
   );
 };

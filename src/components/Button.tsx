@@ -31,16 +31,16 @@ export const Button: React.FC<ButtonProps> = ({
   // Variant styles
   const variants = {
     primary:
-      "bg-control-cta hover:bg-control-ctaHover focus:ring-control-default-900/20 text-text-dark",
+      "bg-control-cta hover:bg-control-ctaHover active:bg-control-cta focus-visible:ring-control-default-900/20 text-text-dark",
     secondary:
-      "bg-control-secondary text-text-dark border-border-default border hover:bg-control-secondaryHover focus:ring-control-secondary/10",
+      "bg-control-secondary text-text-dark border-border-default border hover:bg-control-secondaryHover active:bg-control-secondary focus-visible:ring-control-secondary/10",
   };
 
   // Size styles
   const sizes = {
     sm: "px-8 py-1 text-caption",
     md: "px-8 py-2 text-base",
-    lg: "px-8 py-3 text-number",
+    lg: "px-8 py-2 text-[1.25rem]",
   };
 
   // Icon sizes based on button size
@@ -62,7 +62,9 @@ export const Button: React.FC<ButtonProps> = ({
     "inline-flex items-center justify-center gap-2",
     "rounded-xl",
     "transition-colors duration-100",
-    "focus:outline-none focus:ring-4",
+    "focus:outline-none focus-visible:ring-4",
+    // Touch behavior for mobile
+    "touch-manipulation",
     // Disabled state
     "disabled:bg-control-disabled disabled:text-text-placeholder disabled:cursor-not-allowed",
     // Width

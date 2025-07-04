@@ -46,11 +46,11 @@ export default {
         },
       },
       spacing: {
-        xSmall: "4px",
-        small: "16px",
-        large: "24px",
-        xLarge: "48px",
-        xxLarge: "64px",
+        xSmall: "0.25rem",
+        small: "1rem",
+        large: "2rem",
+        xLarge: "3rem",
+        xxLarge: "4rem",
       },
       maxWidth: {
         content: "42rem", // 672px - our main content width
