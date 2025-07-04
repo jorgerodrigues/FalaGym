@@ -58,43 +58,50 @@ export const useAudioPlayer = (
 
   const { onEnded, onError, onPlay, onPause } = options || {};
 
-  const stop = useCallback(() => {
+  const handleEnded = useCallback(() => {
+    setIsPlaying(false);
+    setIsLoading(false);
+    onEnded?.();
+  }, [onEnded]);
+
+  const handleError = useCallback(() => {
+    const error = new Error("Audio playback failed");
+    setIsPlaying(false);
+    setIsLoading(false);
+    onError?.(error);
+  }, [onError]);
+
+  const cleanup = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
+      audioRef.current.removeEventListener("ended", handleEnded);
+      audioRef.current.removeEventListener("error", handleError);
       audioRef.current = null;
     }
     setIsPlaying(false);
     setIsLoading(false);
+  }, [handleEnded, handleError]);
+
+  const stop = useCallback(() => {
+    cleanup();
     onPause?.();
-  }, [onPause]);
+  }, [cleanup, onPause]);
 
   const play = useCallback(() => {
     if (!audioUrl) {
       return;
     }
 
-    // Stop any existing audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
+    // Clean up any existing audio
+    cleanup();
 
     try {
       const audio = new Audio(audioUrl);
       audioRef.current = audio;
 
       // Add event listeners
-      audio.addEventListener("ended", () => {
-        setIsPlaying(false);
-        setIsLoading(false);
-        onEnded?.();
-      });
-
-      audio.addEventListener("error", () => {
-        const error = new Error("Audio playback failed");
-        setIsPlaying(false);
-        setIsLoading(false);
-        onError?.(error);
-      });
+      audio.addEventListener("ended", handleEnded);
+      audio.addEventListener("error", handleError);
 
       setIsLoading(true);
 
@@ -115,7 +122,7 @@ export const useAudioPlayer = (
       setIsLoading(false);
       onError?.(error instanceof Error ? error : new Error("Unknown error"));
     }
-  }, [audioUrl, onPlay, onError, onEnded]);
+  }, [audioUrl, onPlay, onError, cleanup, handleEnded, handleError]);
 
   const togglePlayPause = useCallback(() => {
     if (isPlaying) {
@@ -127,13 +134,8 @@ export const useAudioPlayer = (
 
   // Cleanup on component unmount
   useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
+    return cleanup;
+  }, [cleanup]);
 
   return {
     isPlaying,
