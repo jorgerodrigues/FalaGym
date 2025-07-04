@@ -15,7 +15,7 @@ export interface ButtonProps
 // components/Button/Button.tsx
 import React from "react";
 import { Spinner } from "./Spinner";
-import { IconProps } from "@/icons/Send";
+import { IconProps } from "@/types/icons";
 
 export const Button: React.FC<ButtonProps> = ({
   variant = "primary",

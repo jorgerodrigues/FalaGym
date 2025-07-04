@@ -1,4 +1,4 @@
-import { IconProps } from "./Send";
+import { IconProps } from "@/types/icons";
 
 export const PlayIcon: React.FC<IconProps> = ({
   size = 20,

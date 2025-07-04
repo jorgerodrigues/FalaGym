@@ -1,4 +1,4 @@
-import { IconProps } from "./Send";
+import { IconProps } from "@/types/icons";
 
 export const PersonIcon: React.FC<IconProps> = ({
   size = 20,
