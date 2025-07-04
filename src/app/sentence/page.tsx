@@ -7,15 +7,20 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Card as CardType } from "@/features/card/types";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useUser } from "@/providers/LoggedUserProvider";
 import { useTranslations } from "next-intl";
 import { Accordion, AccordionItem } from "@/components/Accordion";
+import { SpeakerIcon } from "@/icons/Speaker";
+import { PauseIcon } from "@/icons/Pause";
+import { STORAGE_BUCKETS_PUBLIC_URL } from "@/constants/storageBuckets";
 
 export default function Page() {
   const t = useTranslations("sentence");
   const [showDefinition, setShowDefinition] = useState(false);
   const [selectedSentenceIdx, setSelectedSentenceIdx] = useState(0);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+
   const { user, setFullPageLoading } = useUser();
 
   const { data, isLoading, refetch } = useQuery({
@@ -66,10 +71,15 @@ export default function Page() {
       ? data?.[0]
       : data?.[selectedSentenceIdx];
 
+    const fullUrl = rawData?.sentence?.audioUrl
+      ? `${STORAGE_BUCKETS_PUBLIC_URL.AUDIO}/${rawData.sentence.audioUrl}`
+      : undefined;
+
     return {
       id: rawData.id,
       sentence: rawData.front,
       translation: rawData.back,
+      audioUrl: fullUrl,
       definitions: rawData?.sentence?.words?.map((word) => ({
         id: word.id,
         word: word.word,
@@ -77,6 +87,8 @@ export default function Page() {
       })),
     };
   }, [data, selectedSentenceIdx]);
+
+  const audioPlayer = useAudioPlayer(selectedSentence?.audioUrl);
 
   const handleNextSentence = async () => {
     if (!data?.length) return;
@@ -91,6 +103,7 @@ export default function Page() {
     }
 
     setShowDefinition(false);
+    audioPlayer.stop();
     return;
   };
 
@@ -131,6 +144,10 @@ export default function Page() {
             onSkip={handleSkip}
             onShowAnswer={handleShowAnswer}
             answerDisplayed={showDefinition}
+            audioUrl={selectedSentence?.audioUrl}
+            onPlayPauseAudio={audioPlayer.togglePlayPause}
+            isPlaying={audioPlayer.isPlaying}
+            isAudioLoading={audioPlayer.isLoading}
           />
           <AnimatePresence mode={"wait"}>
             {showDefinition && (
@@ -193,9 +210,20 @@ type SentenceProps = {
   answerDisplayed?: boolean;
   onSkip: () => void;
   onShowAnswer: () => void;
+  audioUrl?: string;
+  onPlayPauseAudio: () => void;
+  isPlaying: boolean;
+  isAudioLoading?: boolean;
 };
 
-const Sentence: React.FC<SentenceProps> = ({ content, answerDisplayed }) => {
+const Sentence: React.FC<SentenceProps> = ({
+  content,
+  answerDisplayed,
+  audioUrl,
+  onPlayPauseAudio,
+  isPlaying,
+  isAudioLoading,
+}) => {
   const contentValue = useAnimatedText(content);
 
   const textVariants = {
@@ -217,18 +245,50 @@ const Sentence: React.FC<SentenceProps> = ({ content, answerDisplayed }) => {
       className={"flex flex-col items-center gap-xLarge overflow-auto w-full"}
       style={{ width: "100%" }}
     >
-      <motion.p
-        layout={"position"}
-        variants={textVariants}
-        initial="large"
-        animate={answerDisplayed ? "small" : "large"}
-        className={
-          "w-full max-h-[75dvh] text-center text-text-dark text-pretty"
-        }
-        style={{ width: "100%", minWidth: "100%" }}
-      >
-        {contentValue}
-      </motion.p>
+      <div className="flex items-center gap-4 w-full justify-center">
+        <motion.p
+          layout={"position"}
+          variants={textVariants}
+          initial="large"
+          animate={answerDisplayed ? "small" : "large"}
+          className={
+            "max-h-[75dvh] text-center text-text-dark text-pretty flex-1"
+          }
+          style={{ minWidth: "0" }}
+        >
+          {contentValue}
+        </motion.p>
+        {audioUrl && (
+          <motion.button
+            layout={"position"}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.3 }}
+            onClick={onPlayPauseAudio}
+            className="flex-shrink-0 p-3 hover:bg-gray-100 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={
+              isAudioLoading
+                ? "Loading..."
+                : isPlaying
+                ? "Pause audio"
+                : "Play audio"
+            }
+            disabled={isAudioLoading}
+          >
+            {isAudioLoading ? (
+              <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+            ) : isPlaying ? (
+              <PauseIcon size={24} className="text-blue-600" />
+            ) : (
+              <SpeakerIcon
+                size={24}
+                className="text-gray-600 hover:text-blue-600"
+              />
+            )}
+          </motion.button>
+        )}
+      </div>
     </motion.div>
   );
 };
