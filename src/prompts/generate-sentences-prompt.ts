@@ -25,12 +25,14 @@ export const generateSentencesPrompt = `
 
   <output>
   1. THE SENTENCE SHOULD ALWAYS BE IN {{language}}
-  2. Translations of the full sentence and words in {{nativeLanguage}}
-  3. Words: ALL WORDS from the sentence with brief explanations:
+  2. Translations of the full sentence and words in {{nativeLanguage}}.
+  3. Words: ALL WORDS from the sentence with brief explanations AND translations in {{nativeLanguage}}.:
      - Start with the word itself in {{language}}.
-     - Include the translation of each word in {{nativeLanguage}}.
+     - ALWAYS include the translation of each word in {{nativeLanguage}}.
      - Add a short explanation of its meaning in context in {{nativeLanguage}}.
      - Note any alternate meanings or nuances.
      - Mention any grammatical considerations (gender, conjugation, etc.) in {{nativeLanguage}}.
+
+  REMEMBER TO ALWAYS INCLUDE A TRANSLATION OF EACH WORD IN {{nativeLanguage}}.
   </output>
   `;
