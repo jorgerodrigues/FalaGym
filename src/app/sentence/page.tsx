@@ -6,7 +6,8 @@ import { apiFetcher } from "@/lib/api/apiFetcher";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Card as CardType } from "@/features/card/types";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useUser } from "@/providers/LoggedUserProvider";
 import { useTranslations } from "next-intl";
 import { Accordion, AccordionItem } from "@/components/Accordion";
@@ -19,8 +20,7 @@ export default function Page() {
   const [showDefinition, setShowDefinition] = useState(false);
   const [selectedSentenceIdx, setSelectedSentenceIdx] = useState(0);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   const { user, setFullPageLoading } = useUser();
 
   const { data, isLoading, refetch } = useQuery({
@@ -58,16 +58,6 @@ export default function Page() {
     setFullPageLoading?.(isLoading);
   }, [isLoading, setFullPageLoading]);
 
-  // Cleanup audio on component unmount
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
-
   const selectedSentence = useMemo(() => {
     if (!data || data.length === 0) {
       return null;
@@ -98,6 +88,8 @@ export default function Page() {
     };
   }, [data, selectedSentenceIdx]);
 
+  const audioPlayer = useAudioPlayer(selectedSentence?.audioUrl);
+
   const handleNextSentence = async () => {
     if (!data?.length) return;
 
@@ -111,55 +103,8 @@ export default function Page() {
     }
 
     setShowDefinition(false);
-    handleStopAudio();
+    audioPlayer.stop();
     return;
-  };
-
-  const handlePlayPauseAudio = () => {
-    if (!selectedSentence?.audioUrl) return;
-
-    if (isPlaying) {
-      handleStopAudio();
-    } else {
-      handlePlayAudio();
-    }
-  };
-
-  const handlePlayAudio = () => {
-    if (!selectedSentence?.audioUrl) return;
-
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-
-    const audio = new Audio(selectedSentence.audioUrl);
-    audioRef.current = audio;
-
-    audio.addEventListener("ended", () => {
-      setIsPlaying(false);
-    });
-
-    audio.addEventListener("error", () => {
-      setIsPlaying(false);
-    });
-
-    audio
-      .play()
-      .then(() => {
-        setIsPlaying(true);
-      })
-      .catch((error) => {
-        console.error("Error playing audio:", error);
-        setIsPlaying(false);
-      });
-  };
-
-  const handleStopAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    setIsPlaying(false);
   };
 
   const handleSkip = () => {
@@ -200,8 +145,9 @@ export default function Page() {
             onShowAnswer={handleShowAnswer}
             answerDisplayed={showDefinition}
             audioUrl={selectedSentence?.audioUrl}
-            onPlayPauseAudio={handlePlayPauseAudio}
-            isPlaying={isPlaying}
+            onPlayPauseAudio={audioPlayer.togglePlayPause}
+            isPlaying={audioPlayer.isPlaying}
+            isAudioLoading={audioPlayer.isLoading}
           />
           <AnimatePresence mode={"wait"}>
             {showDefinition && (
@@ -267,6 +213,7 @@ type SentenceProps = {
   audioUrl?: string;
   onPlayPauseAudio: () => void;
   isPlaying: boolean;
+  isAudioLoading?: boolean;
 };
 
 const Sentence: React.FC<SentenceProps> = ({
@@ -275,6 +222,7 @@ const Sentence: React.FC<SentenceProps> = ({
   audioUrl,
   onPlayPauseAudio,
   isPlaying,
+  isAudioLoading,
 }) => {
   const contentValue = useAnimatedText(content);
 
@@ -319,9 +267,18 @@ const Sentence: React.FC<SentenceProps> = ({
             transition={{ duration: 0.3 }}
             onClick={onPlayPauseAudio}
             className="flex-shrink-0 p-3 hover:bg-gray-100 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label={isPlaying ? "Pause audio" : "Play audio"}
+            aria-label={
+              isAudioLoading
+                ? "Loading..."
+                : isPlaying
+                ? "Pause audio"
+                : "Play audio"
+            }
+            disabled={isAudioLoading}
           >
-            {isPlaying ? (
+            {isAudioLoading ? (
+              <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+            ) : isPlaying ? (
               <PauseIcon size={24} className="text-blue-600" />
             ) : (
               <SpeakerIcon

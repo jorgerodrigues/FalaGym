@@ -39,7 +39,6 @@ export async function GET(
     });
   } catch (error) {
     if (error instanceof Error) {
-      console.log({ error });
       return new Response(
         `Failed to fetch latest sentence cards: ${error.message}`,
         { status: 500 }
