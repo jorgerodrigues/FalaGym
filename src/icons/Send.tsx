@@ -1,11 +1,4 @@
-export interface IconProps extends React.SVGProps<SVGSVGElement> {
-  size?: number | string;
-  color?: string;
-  strokeWidth?: number;
-  className?: string;
-}
-
-// components/icons/SendIcon.tsx
+import { IconProps } from "@/types/icons";
 
 export const SendIcon: React.FC<IconProps> = ({
   size = 24,
