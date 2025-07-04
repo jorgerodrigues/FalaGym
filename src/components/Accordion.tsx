@@ -185,7 +185,7 @@ export const AccordionItem: React.FC<AccordionItemInternalProps> = ({
     "cursor-pointer",
     "transition-colors duration-100",
     disabled ? "cursor-not-allowed" : "hover:bg-white/20",
-    "focus:outline-none",
+    "focus-visible:outline-none",
     "rounded-t-2xl",
   ]
     .filter(Boolean)
