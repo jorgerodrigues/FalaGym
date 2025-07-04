@@ -39,6 +39,7 @@ export async function GET(
     });
   } catch (error) {
     if (error instanceof Error) {
+      console.log({ error });
       return new Response(
         `Failed to fetch latest sentence cards: ${error.message}`,
         { status: 500 }
@@ -79,7 +80,7 @@ const getLatestSentenceCards = async ({
       take: 10,
       skip: skip ?? 0,
     });
-    //
+
     // Get user's language preference or default to Danish
     const userLanguagePref = await getLanguagePreference(userId);
     const language = userLanguagePref?.languageCode || "da";
@@ -139,7 +140,9 @@ const getLatestSentenceCards = async ({
     }
 
     return cards;
-  } catch {
-    throw new Error("Failed to fetch latest sentence cards");
+  } catch (e) {
+    if (e instanceof Error) {
+      throw new Error("Failed to fetch latest sentence cards" + e.message);
+    }
   }
 };

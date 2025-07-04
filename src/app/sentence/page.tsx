@@ -6,16 +6,21 @@ import { apiFetcher } from "@/lib/api/apiFetcher";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Card as CardType } from "@/features/card/types";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useUser } from "@/providers/LoggedUserProvider";
 import { useTranslations } from "next-intl";
 import { Accordion, AccordionItem } from "@/components/Accordion";
+import { SpeakerIcon } from "@/icons/Speaker";
+import { PauseIcon } from "@/icons/Pause";
+import { STORAGE_BUCKETS_PUBLIC_URL } from "@/constants/storageBuckets";
 
 export default function Page() {
   const t = useTranslations("sentence");
   const [showDefinition, setShowDefinition] = useState(false);
   const [selectedSentenceIdx, setSelectedSentenceIdx] = useState(0);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const { user, setFullPageLoading } = useUser();
 
   const { data, isLoading, refetch } = useQuery({
@@ -53,6 +58,16 @@ export default function Page() {
     setFullPageLoading?.(isLoading);
   }, [isLoading, setFullPageLoading]);
 
+  // Cleanup audio on component unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
   const selectedSentence = useMemo(() => {
     if (!data || data.length === 0) {
       return null;
@@ -66,10 +81,15 @@ export default function Page() {
       ? data?.[0]
       : data?.[selectedSentenceIdx];
 
+    const fullUrl = rawData?.sentence?.audioUrl
+      ? `${STORAGE_BUCKETS_PUBLIC_URL.AUDIO}/${rawData.sentence.audioUrl}`
+      : undefined;
+
     return {
       id: rawData.id,
       sentence: rawData.front,
       translation: rawData.back,
+      audioUrl: fullUrl,
       definitions: rawData?.sentence?.words?.map((word) => ({
         id: word.id,
         word: word.word,
@@ -91,7 +111,55 @@ export default function Page() {
     }
 
     setShowDefinition(false);
+    handleStopAudio();
     return;
+  };
+
+  const handlePlayPauseAudio = () => {
+    if (!selectedSentence?.audioUrl) return;
+
+    if (isPlaying) {
+      handleStopAudio();
+    } else {
+      handlePlayAudio();
+    }
+  };
+
+  const handlePlayAudio = () => {
+    if (!selectedSentence?.audioUrl) return;
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+
+    const audio = new Audio(selectedSentence.audioUrl);
+    audioRef.current = audio;
+
+    audio.addEventListener("ended", () => {
+      setIsPlaying(false);
+    });
+
+    audio.addEventListener("error", () => {
+      setIsPlaying(false);
+    });
+
+    audio
+      .play()
+      .then(() => {
+        setIsPlaying(true);
+      })
+      .catch((error) => {
+        console.error("Error playing audio:", error);
+        setIsPlaying(false);
+      });
+  };
+
+  const handleStopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setIsPlaying(false);
   };
 
   const handleSkip = () => {
@@ -131,6 +199,9 @@ export default function Page() {
             onSkip={handleSkip}
             onShowAnswer={handleShowAnswer}
             answerDisplayed={showDefinition}
+            audioUrl={selectedSentence?.audioUrl}
+            onPlayPauseAudio={handlePlayPauseAudio}
+            isPlaying={isPlaying}
           />
           <AnimatePresence mode={"wait"}>
             {showDefinition && (
@@ -193,9 +264,18 @@ type SentenceProps = {
   answerDisplayed?: boolean;
   onSkip: () => void;
   onShowAnswer: () => void;
+  audioUrl?: string;
+  onPlayPauseAudio: () => void;
+  isPlaying: boolean;
 };
 
-const Sentence: React.FC<SentenceProps> = ({ content, answerDisplayed }) => {
+const Sentence: React.FC<SentenceProps> = ({
+  content,
+  answerDisplayed,
+  audioUrl,
+  onPlayPauseAudio,
+  isPlaying,
+}) => {
   const contentValue = useAnimatedText(content);
 
   const textVariants = {
@@ -217,18 +297,41 @@ const Sentence: React.FC<SentenceProps> = ({ content, answerDisplayed }) => {
       className={"flex flex-col items-center gap-xLarge overflow-auto w-full"}
       style={{ width: "100%" }}
     >
-      <motion.p
-        layout={"position"}
-        variants={textVariants}
-        initial="large"
-        animate={answerDisplayed ? "small" : "large"}
-        className={
-          "w-full max-h-[75dvh] text-center text-text-dark text-pretty"
-        }
-        style={{ width: "100%", minWidth: "100%" }}
-      >
-        {contentValue}
-      </motion.p>
+      <div className="flex items-center gap-4 w-full justify-center">
+        <motion.p
+          layout={"position"}
+          variants={textVariants}
+          initial="large"
+          animate={answerDisplayed ? "small" : "large"}
+          className={
+            "max-h-[75dvh] text-center text-text-dark text-pretty flex-1"
+          }
+          style={{ minWidth: "0" }}
+        >
+          {contentValue}
+        </motion.p>
+        {audioUrl && (
+          <motion.button
+            layout={"position"}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.3 }}
+            onClick={onPlayPauseAudio}
+            className="flex-shrink-0 p-3 hover:bg-gray-100 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={isPlaying ? "Pause audio" : "Play audio"}
+          >
+            {isPlaying ? (
+              <PauseIcon size={24} className="text-blue-600" />
+            ) : (
+              <SpeakerIcon
+                size={24}
+                className="text-gray-600 hover:text-blue-600"
+              />
+            )}
+          </motion.button>
+        )}
+      </div>
     </motion.div>
   );
 };
