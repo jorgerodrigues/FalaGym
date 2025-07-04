@@ -172,20 +172,24 @@ export const AccordionItem: React.FC<AccordionItemInternalProps> = ({
     "border-1 border-border-default",
     "shadow",
     "transition-all duration-200",
-    disabled ? "opacity-50 cursor-not-allowed" : "",
+    disabled ? "opacity-50" : "",
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
+  // Container cursor styles
+  const containerCursorStyles = disabled
+    ? "cursor-not-allowed"
+    : "cursor-pointer";
+
   // Header styles
   const headerStyles = [
     "flex items-center justify-between",
     "p-small",
-    "cursor-pointer",
     "transition-colors duration-100",
-    disabled ? "cursor-not-allowed" : "hover:bg-white/20",
-    "focus-visible:outline-none",
+    disabled ? "" : "hover:bg-white/20",
+    "focus:outline-none",
     "rounded-t-2xl",
   ]
     .filter(Boolean)
@@ -193,9 +197,7 @@ export const AccordionItem: React.FC<AccordionItemInternalProps> = ({
 
   return (
     <motion.div
-      className={`${baseStyles} ${
-        disabled ? "cursor-not-allowed" : "cursor-pointer"
-      }`}
+      className={`${baseStyles} ${containerCursorStyles}`}
       id={id}
       layout
       initial={accordionItemVariants.initial}
@@ -204,11 +206,7 @@ export const AccordionItem: React.FC<AccordionItemInternalProps> = ({
       onClick={handleToggle}
     >
       {/* Header */}
-      <div
-        id={`accordion-header-${itemIndex}`}
-        aria-expanded={isOpen}
-        className={headerStyles.replace("cursor-pointer", "")}
-      >
+      <div className={headerStyles}>
         <div className="flex-1 text-left">
           {typeof title === "string" ? (
             <span className="text-base font-medium text-text-dark capitalize">
