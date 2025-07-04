@@ -204,7 +204,11 @@ export const AccordionItem: React.FC<AccordionItemInternalProps> = ({
       onClick={handleToggle}
     >
       {/* Header */}
-      <div className={headerStyles.replace("cursor-pointer", "")}>
+      <div
+        id={`accordion-header-${itemIndex}`}
+        aria-expanded={isOpen}
+        className={headerStyles.replace("cursor-pointer", "")}
+      >
         <div className="flex-1 text-left">
           {typeof title === "string" ? (
             <span className="text-base font-medium text-text-dark capitalize">
