@@ -11,6 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { isSameLanguage } from "@/utils/language/isSameLanguage";
 
 export default function IntroPage() {
   const t = useTranslations();
@@ -79,7 +80,7 @@ export default function IntroPage() {
   };
 
   const handleSelectLanguageToLearn = (selectedLanguage: string) => {
-    if (selectedLanguage.toLocaleLowerCase() === usersLanguage?.toLowerCase()) {
+    if (isSameLanguage(usersLanguage, selectedLanguage)) {
       setError(t("onboarding.languages-are-the-same"));
       return;
     }
@@ -93,7 +94,7 @@ export default function IntroPage() {
       return null;
     }
 
-    if (usersLanguage.toLowerCase() === languageToLearn?.toLocaleLowerCase()) {
+    if (isSameLanguage(usersLanguage, languageToLearn)) {
       setError(t("onboarding.languages-are-the-same"));
       return null;
     }

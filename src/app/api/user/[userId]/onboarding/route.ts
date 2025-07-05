@@ -1,6 +1,7 @@
 import { onboarding } from "@/features/onboarding";
 import { userSettings } from "@/features/user-settings";
 import { generateCardsForUser } from "@/lib/cards/generateCardsForUser";
+import { isSameLanguage } from "@/utils/language/isSameLanguage";
 
 type Params = {
   userId: string;
@@ -31,7 +32,7 @@ export async function POST(
       );
     }
 
-    if (languageToLearn?.toLowerCase() === user.nativeLanguage?.toLowerCase()) {
+    if (isSameLanguage(user.nativeLanguage, languageToLearn)) {
       return new Response(
         JSON.stringify({ data: null, error: "languages-are-the-same" }),
         {
