@@ -63,7 +63,6 @@ export const ProfileContent = () => {
   }, [user]);
 
   useEffect(() => {
-    console.log({ languageToPractice, isSuccess });
     if (languageToPractice?.data && isSuccess) {
       setLanguage(languageToPractice.data.languageCode);
     }

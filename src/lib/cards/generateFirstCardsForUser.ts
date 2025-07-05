@@ -15,9 +15,6 @@ export const generateFirstCardsForUser = async (
       },
       take: amount || 5,
     });
-
-    console.log({ amount: existingSentencesOnLanguage?.length });
-
     if (
       !existingSentencesOnLanguage ||
       existingSentencesOnLanguage.length === 0
