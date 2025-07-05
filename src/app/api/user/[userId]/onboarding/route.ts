@@ -65,7 +65,7 @@ export async function POST(
       );
 
       // generates the next set of cards for the user
-      generateCardsForUser(userId, languageToLearn, user.nativeLanguage);
+      await generateCardsForUser(userId, languageToLearn, user.nativeLanguage);
     }
 
     return new Response(
