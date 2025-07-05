@@ -31,6 +31,18 @@ export async function POST(
       );
     }
 
+    if (languageToLearn?.toLowerCase() === user.nativeLanguage?.toLowerCase()) {
+      return new Response(
+        JSON.stringify({ data: null, error: "languages-are-the-same" }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
     const res = await onboarding.markOnboardingComplete({ userId });
 
     if (res.error) {

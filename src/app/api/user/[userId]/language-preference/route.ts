@@ -46,6 +46,21 @@ export async function PUT(
     const user = await userSettings.getUserById(userId);
     const userNativeLanguage = user?.nativeLanguage;
 
+    if (userNativeLanguage?.toLowerCase() === languageCode) {
+      return new Response(
+        JSON.stringify({
+          data: null,
+          error: "languages-are-the-same",
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
     if (!user) {
       return new Response(
         JSON.stringify({ data: null, error: "user-not-found" }),

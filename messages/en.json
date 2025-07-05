@@ -10,7 +10,8 @@
   },
   "onboarding": {
     "which-language-learn": "Which one language would you like to practice?",
-    "which-native-language": "What is your native language? (or the one you are most comfortable with)"
+    "which-native-language": "What is your native language? (or the one you are most comfortable with)",
+    "languages-are-the-same": "Your native language and the language you chose to learn are the same. Please update one of the two before continuing."
   },
   "sentence": {
     "skip": "Skip",

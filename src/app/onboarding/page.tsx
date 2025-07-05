@@ -18,6 +18,7 @@ export default function IntroPage() {
   const { user } = useUser();
   const [usersLanguage, setUsersLanguage] = useState<string | null>(null);
   const [languageToLearn, setLanguageToLearn] = useState<string | null>(null);
+  const [error, setError] = useState<string>();
   const [step, setStep] = useState(0);
 
   const { mutate: updateLanguageToLearn } = useMutation<
@@ -72,8 +73,28 @@ export default function IntroPage() {
     }))
     .filter((l) => l.id === "EN" || l.id === "PT");
 
+  const handleSelectNativeLanguage = (selectedLanguage: string) => {
+    setUsersLanguage(selectedLanguage);
+    setError(undefined);
+  };
+
+  const handleSelectLanguageToLearn = (selectedLanguage: string) => {
+    if (selectedLanguage.toLocaleLowerCase() === usersLanguage?.toLowerCase()) {
+      setError(t("onboarding.languages-are-the-same"));
+      return;
+    }
+    setError(undefined);
+    setLanguageToLearn(selectedLanguage);
+    return;
+  };
+
   const handleNextStep = () => {
     if (!usersLanguage) {
+      return null;
+    }
+
+    if (usersLanguage.toLowerCase() === languageToLearn?.toLocaleLowerCase()) {
+      setError(t("onboarding.languages-are-the-same"));
       return null;
     }
 
@@ -142,7 +163,7 @@ export default function IntroPage() {
                 titleContent={t("onboarding.which-native-language")}
                 possibleLanguages={possibleBaseLanguages}
                 selectedLanguage={usersLanguage ?? ""}
-                onSelectLanguage={setUsersLanguage}
+                onSelectLanguage={handleSelectNativeLanguage}
               />
             </motion.div>
           )}
@@ -166,7 +187,8 @@ export default function IntroPage() {
                 titleContent={t("onboarding.which-language-learn")}
                 possibleLanguages={possibleLanguagesToLearn}
                 selectedLanguage={languageToLearn ?? ""}
-                onSelectLanguage={setLanguageToLearn}
+                onSelectLanguage={handleSelectLanguageToLearn}
+                error={error}
               />
             </motion.div>
           )}

@@ -10,7 +10,8 @@
   },
   "onboarding": {
     "which-language-learn": "Qual língua você gostaria de praticar?",
-    "which-native-language": "Qual é a sua língua nativa? (ou aquela com a qual você se sente mais confortável)"
+    "which-native-language": "Qual é a sua língua nativa? (ou aquela com a qual você se sente mais confortável)",
+    "languages-are-the-same": "Sua língua nativa e a língua que você escolheu para aprender são as mesmas. Por favor, atualize uma das duas antes de continuar."
   },
   "sentence": {
     "skip": "Pular",
