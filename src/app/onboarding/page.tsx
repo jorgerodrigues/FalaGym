@@ -11,6 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { isSameLanguage } from "@/utils/language/isSameLanguage";
 
 export default function IntroPage() {
   const t = useTranslations();
