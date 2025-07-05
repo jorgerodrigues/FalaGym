@@ -79,7 +79,7 @@ export default function IntroPage() {
   };
 
   const handleSelectLanguageToLearn = (selectedLanguage: string) => {
-    if (selectedLanguage.toLocaleLowerCase() === usersLanguage?.toLowerCase()) {
+    if (isSameLanguage(usersLanguage, selectedLanguage)) {
       setError(t("onboarding.languages-are-the-same"));
       return;
     }
@@ -93,7 +93,7 @@ export default function IntroPage() {
       return null;
     }
 
-    if (usersLanguage.toLowerCase() === languageToLearn?.toLocaleLowerCase()) {
+    if (isSameLanguage(usersLanguage, languageToLearn)) {
       setError(t("onboarding.languages-are-the-same"));
       return null;
     }

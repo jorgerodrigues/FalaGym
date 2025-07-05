@@ -46,7 +46,7 @@ export async function PUT(
     const user = await userSettings.getUserById(userId);
     const userNativeLanguage = user?.nativeLanguage;
 
-    if (userNativeLanguage?.toLowerCase() === languageCode) {
+    if (isSameLanguage(userNativeLanguage, validatedLanguageCode)) {
       return new Response(
         JSON.stringify({
           data: null,

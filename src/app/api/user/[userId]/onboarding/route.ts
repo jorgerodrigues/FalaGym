@@ -31,7 +31,7 @@ export async function POST(
       );
     }
 
-    if (languageToLearn?.toLowerCase() === user.nativeLanguage?.toLowerCase()) {
+    if (isSameLanguage(user.nativeLanguage, languageToLearn)) {
       return new Response(
         JSON.stringify({ data: null, error: "languages-are-the-same" }),
         {
