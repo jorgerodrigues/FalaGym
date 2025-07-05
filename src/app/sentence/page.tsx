@@ -245,7 +245,7 @@ const Sentence: React.FC<SentenceProps> = ({
       className={"flex flex-col items-center gap-xLarge overflow-auto w-full"}
       style={{ width: "100%" }}
     >
-      <div className="flex items-center gap-4 w-full justify-center">
+      <div className="flex flex-col md:flex-row items-center gap-4 w-full justify-center">
         <motion.p
           layout={"position"}
           variants={textVariants}
@@ -266,7 +266,7 @@ const Sentence: React.FC<SentenceProps> = ({
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.3 }}
             onClick={onPlayPauseAudio}
-            className="flex-shrink-0 p-3 hover:bg-gray-100 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-shrink-0 p-3 hover:bg-gray-100 rounded-full transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible::ring-2 focus-visible::ring-blue-500"
             aria-label={
               isAudioLoading
                 ? "Loading..."
