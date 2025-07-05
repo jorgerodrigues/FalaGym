@@ -1,5 +1,6 @@
 import { onboarding } from "@/features/onboarding";
 import { userSettings } from "@/features/user-settings";
+import { generateCardsForUser } from "@/lib/cards/generateCardsForUser";
 
 import { generateFirstCardsForUser } from "@/lib/cards/generateFirstCardsForUser";
 import { isSameLanguage } from "@/utils/language/isSameLanguage";
@@ -62,7 +63,9 @@ export async function POST(
         languageToLearn,
         user.nativeLanguage
       );
-      // generateCardsForUser(userId, languageToLearn, user.nativeLanguage);
+
+      // generates the next set of cards for the user
+      generateCardsForUser(userId, languageToLearn, user.nativeLanguage);
     }
 
     return new Response(
