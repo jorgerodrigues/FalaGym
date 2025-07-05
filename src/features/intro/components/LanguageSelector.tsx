@@ -33,7 +33,7 @@ export const LanguageSelector: React.FC<LanguageSelectorArgs> = ({
       </div>
 
       {error && (
-        <p className="py-large" style={{ color: "red" }}>
+        <p className="py-large" style={{ color: "red" }} aria-live="assertive">
           {error}
         </p>
       )}
