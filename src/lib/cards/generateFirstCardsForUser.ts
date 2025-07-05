@@ -18,9 +18,12 @@ export const generateFirstCardsForUser = async (
 
     console.log({ amount: existingSentencesOnLanguage?.length });
 
-    if (!existingSentencesOnLanguage) {
-      return;
+    if (
+      !existingSentencesOnLanguage ||
+      existingSentencesOnLanguage.length === 0
+    ) {
       await generateCardsForUser(userId, languageToPractice, nativeLanguage, 5);
+      return;
     }
 
     for (const sentence of existingSentencesOnLanguage) {
