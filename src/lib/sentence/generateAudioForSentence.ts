@@ -15,6 +15,10 @@ export const generateAudioForSentence = async ({
   language: string;
 }) => {
   try {
+    if (process.env.GENERATE_AUDIO_SENTENCES_ON_DEV === "false") {
+      return "";
+    }
+
     const fileName = `sentence-${id}.wav`;
     const languageName = languageNameFromCode(language);
 

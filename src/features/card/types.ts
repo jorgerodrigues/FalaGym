@@ -11,7 +11,7 @@ export const CardSchema = z.object({
   interval: z.number(),
   nextDueDate: z.string().or(z.date()).optional(),
   userId: z.string().uuid(),
-  sentenceId: z.string().uuid().optional(),
+  sentenceId: z.string().uuid().optional().nullable(),
 
   sentence: SentenceSchema.optional(),
 

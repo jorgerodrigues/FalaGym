@@ -1,6 +1,8 @@
 import { onboarding } from "@/features/onboarding";
 import { userSettings } from "@/features/user-settings";
 import { generateCardsForUser } from "@/lib/cards/generateCardsForUser";
+
+import { generateFirstCardsForUser } from "@/lib/cards/generateFirstCardsForUser";
 import { isSameLanguage } from "@/utils/language/isSameLanguage";
 
 type Params = {
@@ -56,7 +58,14 @@ export async function POST(
     }
 
     if (languageToLearn) {
-      generateCardsForUser(userId, languageToLearn, user.nativeLanguage);
+      await generateFirstCardsForUser(
+        userId,
+        languageToLearn,
+        user.nativeLanguage
+      );
+
+      // generates the next set of cards for the user
+      await generateCardsForUser(userId, languageToLearn, user.nativeLanguage);
     }
 
     return new Response(

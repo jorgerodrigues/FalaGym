@@ -65,10 +65,10 @@ model Card {
   nextDueDate    DateTime @default(now()) // date and time of the next review
   type           String   @default("sentence")
   language       String   @default("en")
-  nativeLanguage String   @default("pt_br")
+  nativeLanguage String   @default("pt")
 
-  sentence   Sentence @relation(fields: [sentenceId], references: [id])
-  sentenceId String
+  sentence   Sentence? @relation(fields: [sentenceId], references: [id], onDelete: SetNull)
+  sentenceId String?
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
@@ -85,11 +85,11 @@ model CardReviewLog {
   reviewDate DateTime @default(now())
   rating     Int      @default(0) // rating 0, 3 or 5
 
-  card   Card   @relation(fields: [cardId], references: [id])
-  cardId String
+  card   Card?   @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  cardId String?
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
