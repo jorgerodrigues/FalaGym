@@ -138,7 +138,7 @@ export const ProfileContent = () => {
               { id: "en", content: "🇬🇧 English" },
               { id: "it", content: "🇮🇹 Italian" },
               { id: "es", content: "🇪🇸 Spanish" },
-              { id: "pt_br", content: "🇧🇷 Portuguese" },
+              { id: "pt", content: "🇧🇷 Portuguese" },
             ]}
             onSelect={(id) => setLanguage(id)}
             selectedId={language}
