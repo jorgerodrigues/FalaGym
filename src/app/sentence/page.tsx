@@ -44,7 +44,7 @@ export default function Page() {
     // Only run this effect when data is available and not empty
     if (data && data.length > 0) {
       const cardInfo = data[selectedSentenceIdx];
-      if (cardInfo && !selectedCardId) {
+      if (cardInfo && selectedCardId === null) {
         setSelectedCardId(cardInfo.id);
       }
     }
