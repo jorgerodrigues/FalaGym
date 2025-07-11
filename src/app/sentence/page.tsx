@@ -44,11 +44,11 @@ export default function Page() {
     // Only run this effect when data is available and not empty
     if (data && data.length > 0) {
       const cardInfo = data[selectedSentenceIdx];
-      if (cardInfo) {
+      if (cardInfo && !selectedCardId) {
         setSelectedCardId(cardInfo.id);
       }
     }
-  }, [data, selectedSentenceIdx]);
+  }, [data, selectedCardId, selectedSentenceIdx]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
