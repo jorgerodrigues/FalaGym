@@ -6,7 +6,7 @@ import { apiFetcher } from "@/lib/api/apiFetcher";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Card as CardType } from "@/features/card/types";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useUser } from "@/providers/LoggedUserProvider";
 import { useTranslations } from "next-intl";
@@ -18,8 +18,10 @@ import { STORAGE_BUCKETS_PUBLIC_URL } from "@/constants/storageBuckets";
 export default function Page() {
   const t = useTranslations("sentence");
   const [showDefinition, setShowDefinition] = useState(false);
-  const [selectedSentenceIdx, setSelectedSentenceIdx] = useState(0);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const [availableCards, setAvailableCards] = useState<Array<CardType>>([]);
+  const [isRefetching, setIsRefetching] = useState(false);
+  const selectedCardIdRef = useRef<string | null>(null);
 
   const { user, setFullPageLoading } = useUser();
 
@@ -31,24 +33,37 @@ export default function Page() {
   });
 
   const { mutate: logCard } = useMutation({
-    mutationFn: (r: number) =>
-      apiFetcher(`api/card/${selectedCardId}/review`, {
+    mutationFn: (r: number) => {
+      if (!selectedCardId) {
+        throw new Error("No card selected");
+      }
+      return apiFetcher(`api/card/${selectedCardId}/review`, {
         method: "POST",
         body: JSON.stringify({
           rating: r,
         }),
-      }),
+      });
+    },
   });
 
   useEffect(() => {
-    // Only run this effect when data is available and not empty
+    selectedCardIdRef.current = selectedCardId;
+  }, [selectedCardId]);
+
+  useEffect(() => {
     if (data && data.length > 0) {
-      const cardInfo = data[selectedSentenceIdx];
-      if (cardInfo && selectedCardId === null) {
-        setSelectedCardId(cardInfo.id);
+      setAvailableCards(data);
+      const hasValidSelection =
+        selectedCardIdRef.current &&
+        data.find((card) => card.id === selectedCardIdRef.current);
+      if (!hasValidSelection) {
+        setSelectedCardId(data[0].id);
       }
+      setIsRefetching(false);
+    } else if (data && data.length === 0) {
+      setIsRefetching(false);
     }
-  }, [data, selectedCardId, selectedSentenceIdx]);
+  }, [data, isRefetching]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -59,47 +74,69 @@ export default function Page() {
   }, [isLoading, setFullPageLoading]);
 
   const selectedSentence = useMemo(() => {
-    if (!data || data.length === 0) {
+    if (!availableCards?.length || !selectedCardId) {
       return null;
     }
 
-    if (selectedSentenceIdx < 0) {
+    const item = availableCards.find((i) => i.id === selectedCardId);
+
+    if (!item) {
       return null;
     }
 
-    const rawData = !data?.[selectedSentenceIdx]
-      ? data?.[0]
-      : data?.[selectedSentenceIdx];
-
-    const fullUrl = rawData?.sentence?.audioUrl
-      ? `${STORAGE_BUCKETS_PUBLIC_URL.AUDIO}/${rawData.sentence.audioUrl}`
+    const fullUrl = item.sentence?.audioUrl
+      ? `${STORAGE_BUCKETS_PUBLIC_URL.AUDIO}/${item.sentence.audioUrl}`
       : undefined;
 
     return {
-      id: rawData.id,
-      sentence: rawData.front,
-      translation: rawData.back,
+      id: item.id,
+      sentence: item.front,
+      translation: item.back,
       audioUrl: fullUrl,
-      definitions: rawData?.sentence?.words?.map((word) => ({
-        id: word.id,
-        word: word.word,
-        definition: word.definition,
-      })),
+      definitions:
+        item.sentence?.words?.map((word) => ({
+          id: word.id,
+          word: word.word,
+          definition: word.definition,
+        })) || [],
     };
-  }, [data, selectedSentenceIdx]);
+  }, [availableCards, selectedCardId]);
 
   const audioPlayer = useAudioPlayer(selectedSentence?.audioUrl);
 
   const handleNextSentence = async () => {
-    if (!data?.length) return;
-
-    if (selectedSentenceIdx < data?.length - 1) {
-      setSelectedSentenceIdx((prev) => prev + 1);
+    if (!availableCards?.length) {
+      return;
     }
 
-    if (selectedSentenceIdx === data?.length - 1) {
-      await refetch();
-      setSelectedSentenceIdx(0);
+    if (availableCards?.length > 1) {
+      const nextCard = availableCards?.[1];
+      setAvailableCards((prev) => prev.filter((c) => c.id !== selectedCardId));
+      setSelectedCardId(nextCard.id);
+      setShowDefinition(false);
+      audioPlayer.stop();
+      return;
+    }
+
+    if (availableCards?.length === 1) {
+      setIsRefetching(true);
+
+      setAvailableCards((prev) => prev.filter((c) => c.id !== selectedCardId));
+      setSelectedCardId(null);
+
+      try {
+        await refetch();
+
+        setShowDefinition(false);
+        audioPlayer.stop();
+        return;
+      } catch {
+        // Reset to show loading state
+        setShowDefinition(false);
+        audioPlayer.stop();
+        setIsRefetching(false);
+        return;
+      }
     }
 
     setShowDefinition(false);
@@ -116,14 +153,28 @@ export default function Page() {
   };
 
   const handleWrong = () => {
-    logCard(0);
-    handleNextSentence();
+    if (!selectedCardId) {
+      return;
+    }
+    logCard(0, {
+      onSuccess: () => {
+        handleNextSentence();
+      },
+      onError: () => {},
+    });
     return;
   };
 
   const handleRight = () => {
-    logCard(5);
-    handleNextSentence();
+    if (!selectedCardId) {
+      return;
+    }
+    logCard(5, {
+      onSuccess: () => {
+        handleNextSentence();
+      },
+      onError: () => {},
+    });
   };
 
   return (
@@ -131,20 +182,20 @@ export default function Page() {
       className={`relative flex flex-col w-full items-center justify-center h-full min-h-[80vh] p-small lg:p-large`}
       layout={"position"}
     >
-      {selectedSentence && (
+      {selectedSentence ? (
         <div
-          key={selectedSentence.id ?? "loading"}
+          key={selectedSentence.id}
           className={
             "flex flex-col md:max-w-[600px] xl:max-w-[850px] gap-xLarge w-full py-large"
           }
           style={{ width: "100%" }}
         >
           <Sentence
-            content={selectedSentence?.sentence ?? ""}
+            content={selectedSentence.sentence}
             onSkip={handleSkip}
             onShowAnswer={handleShowAnswer}
             answerDisplayed={showDefinition}
-            audioUrl={selectedSentence?.audioUrl}
+            audioUrl={selectedSentence.audioUrl}
             onPlayPauseAudio={audioPlayer.togglePlayPause}
             isPlaying={audioPlayer.isPlaying}
             isAudioLoading={audioPlayer.isLoading}
@@ -152,25 +203,42 @@ export default function Page() {
           <AnimatePresence mode={"wait"}>
             {showDefinition && (
               <Definition
-                sentenceDefinition={selectedSentence?.translation ?? ""}
-                words={selectedSentence?.definitions ?? []}
+                sentenceDefinition={selectedSentence.translation}
+                words={selectedSentence.definitions}
               />
             )}
           </AnimatePresence>
         </div>
+      ) : isLoading || isRefetching ? (
+        <div className="flex items-center justify-center h-40">
+          <p className="text-gray-500">Loading sentences...</p>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-40 gap-4">
+          <p className="text-gray-500">No sentences available</p>
+
+          <button
+            onClick={() => refetch()}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
       )}
-      <div
-        className={
-          "fixed bottom-large left-0 right-0 mx-auto w-full md:max-w-[600px] xl:max-w-[850px]"
-        }
-      >
-        <SentenceButtons
-          skipLabel={showDefinition ? t("wrong") : t("skip")}
-          confirmLabel={showDefinition ? t("right") : t("show-answer")}
-          onConfirm={showDefinition ? handleRight : handleShowAnswer}
-          onSkip={showDefinition ? handleWrong : handleSkip}
-        />
-      </div>
+      {selectedSentence && (
+        <div
+          className={
+            "fixed bottom-large left-0 right-0 mx-auto w-full md:max-w-[600px] xl:max-w-[850px]"
+          }
+        >
+          <SentenceButtons
+            skipLabel={showDefinition ? t("wrong") : t("skip")}
+            confirmLabel={showDefinition ? t("right") : t("show-answer")}
+            onConfirm={showDefinition ? handleRight : handleShowAnswer}
+            onSkip={showDefinition ? handleWrong : handleSkip}
+          />
+        </div>
+      )}
     </motion.div>
   );
 }
