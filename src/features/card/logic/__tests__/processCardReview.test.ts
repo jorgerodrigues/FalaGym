@@ -65,7 +65,7 @@ describe("processCardReview", () => {
       interval: 12,
       newDueDate: new Date("2023-01-27T00:00:00Z"),
       repetitions: 3, // Incremented
-      lastReviewedAt: new Date(mockCurrentTime),
+      lastReviewedAt: mockCurrentTime,
     });
   });
 
@@ -95,7 +95,7 @@ describe("processCardReview", () => {
       interval: 12,
       newDueDate: new Date("2023-01-27T00:00:00Z"),
       repetitions: 0, // Reset to 0 on failure
-      lastReviewedAt: new Date(mockCurrentTime),
+      lastReviewedAt: mockCurrentTime,
     });
   });
 

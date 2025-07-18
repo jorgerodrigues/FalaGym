@@ -3,6 +3,7 @@ import { calculateEloChange } from "../calculateEloChange";
 import { calculateStreakMultiplier } from "../calculateStreakMultiplier";
 import { calculateRecencyWeight } from "../calculateRecencyWeight";
 import { enforceBounds } from "../enforceBounds";
+import { SCORES } from "../../../../../constants/elo";
 
 describe("ELO System Integration", () => {
   /**
@@ -37,7 +38,7 @@ describe("ELO System Integration", () => {
     it("should calculate ELO change with all factors applied", () => {
       const userElo = 1200;
       const sentenceElo = 1300;
-      const actualScore = 1; // Correct answer
+      const actualScore = SCORES.CORRECT;
       const streakPosition = 5; // In streak
       const sessionTimestamp = new Date(2024, 0, 14);
       const currentTimestamp = new Date(2024, 0, 15); // 1 day later
@@ -61,7 +62,7 @@ describe("ELO System Integration", () => {
     it("should handle losing streak scenarios", () => {
       const userElo = 1400;
       const sentenceElo = 1200;
-      const actualScore = 0; // Incorrect answer
+      const actualScore = SCORES.INCORRECT;
       const streakPosition = 2; // No streak bonus
       const sessionTimestamp = new Date(2024, 0, 15);
       const currentTimestamp = new Date(2024, 0, 15); // Same day
@@ -82,7 +83,7 @@ describe("ELO System Integration", () => {
     it("should apply all bonuses for perfect streak scenario", () => {
       const userElo = 1100;
       const sentenceElo = 1500;
-      const actualScore = 1; // Correct answer
+      const actualScore = SCORES.CORRECT;
       const streakPosition = 10; // Long streak
       const sessionTimestamp = new Date(2024, 0, 15);
       const currentTimestamp = new Date(2024, 0, 15); // Same day
@@ -104,7 +105,7 @@ describe("ELO System Integration", () => {
     it("should handle old session with recency penalty", () => {
       const userElo = 1200;
       const sentenceElo = 1200;
-      const actualScore = 1; // Correct answer
+      const actualScore = SCORES.CORRECT;
       const streakPosition = 5; // In streak
       const sessionTimestamp = new Date(2024, 0, 8);
       const currentTimestamp = new Date(2024, 0, 15); // 7 days later
@@ -130,7 +131,7 @@ describe("ELO System Integration", () => {
     it("should prevent exceeding maximum ELO", () => {
       const userElo = 1980;
       const sentenceElo = 1000;
-      const actualScore = 1; // Easy win
+      const actualScore = SCORES.CORRECT;
       const streakPosition = 10; // Big streak bonus
       const sessionTimestamp = new Date(2024, 0, 15);
       const currentTimestamp = new Date(2024, 0, 15); // Same day
@@ -152,7 +153,7 @@ describe("ELO System Integration", () => {
     it("should prevent going below minimum ELO", () => {
       const userElo = 820;
       const sentenceElo = 1800;
-      const actualScore = 0; // Hard loss
+      const actualScore = SCORES.INCORRECT;
       const streakPosition = 0; // No streak
       const sessionTimestamp = new Date(2024, 0, 15);
       const currentTimestamp = new Date(2024, 0, 15); // Same day
@@ -176,7 +177,7 @@ describe("ELO System Integration", () => {
     it("should handle zero ELO change scenarios", () => {
       const userElo = 800;
       const sentenceElo = 1200;
-      const actualScore = 0; // Loss at minimum ELO
+      const actualScore = SCORES.INCORRECT;
       const streakPosition = 0;
       const sessionTimestamp = new Date(2024, 0, 15);
       const currentTimestamp = new Date(2024, 0, 15);
@@ -193,7 +194,7 @@ describe("ELO System Integration", () => {
     it("should handle extreme ELO differences", () => {
       const userElo = 800;
       const sentenceElo = 2000;
-      const actualScore = 1; // Massive upset
+      const actualScore = SCORES.CORRECT;
       const streakPosition = 5; // Streak bonus
       const sessionTimestamp = new Date(2024, 0, 15);
       const currentTimestamp = new Date(2024, 0, 15);
@@ -211,7 +212,7 @@ describe("ELO System Integration", () => {
     it("should handle very old sessions", () => {
       const userElo = 1200;
       const sentenceElo = 1300;
-      const actualScore = 1;
+      const actualScore = SCORES.CORRECT;
       const streakPosition = 5;
       const sessionTimestamp = new Date(2024, 0, 1);
       const currentTimestamp = new Date(2024, 11, 31); // ~365 days later
@@ -230,10 +231,10 @@ describe("ELO System Integration", () => {
   describe("Mathematical consistency", () => {
     it("should maintain consistency across multiple calculations", () => {
       const scenarios = [
-        { userElo: 1200, sentenceElo: 1200, score: 1, streak: 0 },
-        { userElo: 1200, sentenceElo: 1300, score: 1, streak: 5 },
-        { userElo: 1400, sentenceElo: 1200, score: 0, streak: 2 },
-        { userElo: 1000, sentenceElo: 1800, score: 1, streak: 10 },
+        { userElo: 1200, sentenceElo: 1200, score: SCORES.CORRECT, streak: 0 },
+        { userElo: 1200, sentenceElo: 1300, score: SCORES.CORRECT, streak: 5 },
+        { userElo: 1400, sentenceElo: 1200, score: SCORES.INCORRECT, streak: 2 },
+        { userElo: 1000, sentenceElo: 1800, score: SCORES.CORRECT, streak: 10 },
       ];
       
       const sessionTime = new Date(2024, 0, 15);
@@ -268,7 +269,7 @@ describe("ELO System Integration", () => {
       // Simulate 10 consecutive wins
       for (let i = 0; i < 10; i++) {
         const change = calculateCompleteEloChange(
-          currentElo, sentenceElo, 1, streakPosition, 
+          currentElo, sentenceElo, SCORES.CORRECT, streakPosition, 
           sessionTime, currentTime
         );
         changes.push(change);
