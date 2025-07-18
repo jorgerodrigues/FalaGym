@@ -2,7 +2,7 @@
  * Calculates the ELO rating change for a user based on their performance against a sentence
  * Uses the standard ELO rating system formula with K-factor of 32
  *
- * @para userElo - Current ELO rating of the user
+ * @param userElo - Current ELO rating of the user
  * @param sentenceElo - ELO rating of the sentence being practiced
  * @param actualScore - Actual performance score (0 for incorrect, 1 for correct)
  * @returns The ELO change as a float (can be positive or negative)
