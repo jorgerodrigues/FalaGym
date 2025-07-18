@@ -7,7 +7,7 @@ import { apiFetcher } from "@/lib/api/apiFetcher";
 import { useUser } from "@/providers/LoggedUserProvider";
 import { languageFlagFromCode } from "@/utils/language/languageFlagFromCode";
 import { useMutation } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";

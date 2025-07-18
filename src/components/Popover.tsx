@@ -1,7 +1,7 @@
 "use client";
 import * as RadixPopover from "@radix-ui/react-popover";
+import { AnimatePresence, motion } from "motion/react";
 import React, { ReactNode } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
 export type PopoverOption = {
   id: string;

@@ -179,7 +179,7 @@ export default function Page() {
 
   return (
     <motion.div
-      className={`relative flex flex-col w-full items-center justify-center h-full min-h-[80vh] p-small lg:p-large`}
+      className={`flex flex-col w-full items-center justify-center h-full min-h-[80vh] p-small lg:py-large`}
       layout={"position"}
     >
       {selectedSentence ? (
@@ -217,12 +217,9 @@ export default function Page() {
         <div className="flex flex-col items-center justify-center h-40 gap-4">
           <p className="text-gray-500">No sentences available</p>
 
-          <button
-            onClick={() => refetch()}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-          >
+          <Button variant="primary" onClick={() => refetch()}>
             Retry
-          </button>
+          </Button>
         </div>
       )}
       {selectedSentence && (
@@ -260,7 +257,7 @@ const SentenceButtons = ({
       exit={{ opacity: 0 }}
       initial={{ opacity: 0 }}
       transition={{ duration: 0.3, delay: 0.5 }}
-      className={"flex w-full justify-between px-small"}
+      className={"flex w-full justify-between"}
       style={{ width: "100%" }}
     >
       <Button variant="secondary" onClick={onSkip}>
@@ -298,12 +295,12 @@ const Sentence: React.FC<SentenceProps> = ({
     large: {
       fontSize: "1.5rem", // text-3xl
       fontWeight: "400",
-      transition: { duration: 0.3, ease: "easeInOut" },
+      transition: { duration: 0.3, ease: "easeOut" as const },
     },
     small: {
       fontSize: "1rem", // text-lg
       fontWeight: "300",
-      transition: { duration: 0.3, ease: "easeInOut" },
+      transition: { duration: 0.3, ease: "easeOut" as const },
     },
   };
 
