@@ -14,15 +14,15 @@ datasource db {
 }
 
 model User {
-  id                  String    @id @unique @default(uuid())
-  email               String    @unique
-  firstName           String?
-  lastName            String?
-  status              String    @default("ACTIVE")
-  password            String
-  nativeLanguage      String    @default("en")
-  onboardingCompleted Boolean   @default(false)
-  currentEloScore     Int       @default(1200)
+  id                   String    @id @unique @default(uuid())
+  email                String    @unique
+  firstName            String?
+  lastName             String?
+  status               String    @default("ACTIVE")
+  password             String
+  nativeLanguage       String    @default("en")
+  onboardingCompleted  Boolean   @default(false)
+  currentEloScore      Int       @default(1200)
   lastSessionTimestamp DateTime?
 
   createdAt     DateTime        @default(now())
@@ -199,15 +199,15 @@ model UserSettings {
 }
 
 model Session {
-  id               String    @id @unique @default(uuid())
-  userId           String
-  startTimestamp   DateTime  @default(now())
-  endTimestamp     DateTime?
-  startingUserElo  Int
-  endingUserElo    Int?
-  status           String    @default("ACTIVE") // ACTIVE or COMPLETED
+  id              String    @id @unique @default(uuid())
+  userId          String?
+  startTimestamp  DateTime  @default(now())
+  endTimestamp    DateTime?
+  startingUserElo Int
+  endingUserElo   Int?
+  status          String    @default("ACTIVE") // ACTIVE or COMPLETED
 
-  user          User            @relation(fields: [userId], references: [id])
+  user          User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
   CardReviewLog CardReviewLog[]
 
   createdAt DateTime @default(now())
