@@ -9,20 +9,21 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id                  String  @id @unique @default(uuid())
-  email               String  @unique
+  id                  String    @id @unique @default(uuid())
+  email               String    @unique
   firstName           String?
   lastName            String?
-  status              String  @default("ACTIVE")
+  status              String    @default("ACTIVE")
   password            String
-  nativeLanguage      String  @default("en")
-  onboardingCompleted Boolean @default(false)
+  nativeLanguage      String    @default("en")
+  onboardingCompleted Boolean   @default(false)
+  currentEloScore     Int       @default(1200)
+  lastSessionTimestamp DateTime?
 
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
@@ -30,6 +31,7 @@ model User {
   Card          Card[]
   CardReviewLog CardReviewLog[]
   UserSettings  UserSettings[]
+  Session       Session[]
 
   @@map("user")
 }
@@ -42,6 +44,7 @@ model Sentence {
   language       String?
   nativeLanguage String?
   audioUrl       String?
+  difficultyElo  Int     @default(1200)
 
   words Word[]
   Card  Card[]
@@ -81,15 +84,20 @@ model Card {
 }
 
 model CardReviewLog {
-  id         String   @id @unique @default(uuid())
-  reviewDate DateTime @default(now())
-  rating     Int      @default(0) // rating 0, 3 or 5
+  id             String   @id @unique @default(uuid())
+  reviewDate     DateTime @default(now())
+  rating         Int      @default(0) // rating 0, 3 or 5
+  streakPosition Int      @default(0)
+  eloImpact      Float    @default(0.0)
 
   card   Card?   @relation(fields: [cardId], references: [id], onDelete: SetNull)
   cardId String?
 
   userId String?
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  session   Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  sessionId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -188,4 +196,22 @@ model UserSettings {
   updatedAt DateTime @updatedAt
 
   @@map("user_settings")
+}
+
+model Session {
+  id               String    @id @unique @default(uuid())
+  userId           String
+  startTimestamp   DateTime  @default(now())
+  endTimestamp     DateTime?
+  startingUserElo  Int
+  endingUserElo    Int?
+  status           String    @default("ACTIVE") // ACTIVE or COMPLETED
+
+  user          User            @relation(fields: [userId], references: [id])
+  CardReviewLog CardReviewLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("session")
 }

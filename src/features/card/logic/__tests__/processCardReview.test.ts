@@ -28,10 +28,15 @@ describe("processCardReview", () => {
     vi.spyOn(dueDate, "calculateNextDueDate").mockReturnValue(
       new Date("2023-01-27T00:00:00Z")
     );
+    
+    // Mock Date constructor to return consistent time
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(mockCurrentTime));
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it("should process a successful review (rating >= 3)", () => {
@@ -60,7 +65,7 @@ describe("processCardReview", () => {
       interval: 12,
       newDueDate: new Date("2023-01-27T00:00:00Z"),
       repetitions: 3, // Incremented
-      lastReviewedAt: mockCurrentTime,
+      lastReviewedAt: new Date(mockCurrentTime),
     });
   });
 
@@ -90,7 +95,7 @@ describe("processCardReview", () => {
       interval: 12,
       newDueDate: new Date("2023-01-27T00:00:00Z"),
       repetitions: 0, // Reset to 0 on failure
-      lastReviewedAt: mockCurrentTime,
+      lastReviewedAt: new Date(mockCurrentTime),
     });
   });
 
