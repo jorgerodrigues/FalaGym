@@ -73,7 +73,7 @@ export default async function RootLayout({
                 <NextIntlClientProvider>
                   <div
                     className={
-                      "my-xLarge md:my-0 lg:mr-xLarge lg:px-xxLarge h-[100%] min-h-[80dvh]"
+                      "my-xLarge md:my-0 lg:px-xxLarge h-[100%] min-h-[80dvh]"
                     }
                   >
                     {children}

@@ -2,13 +2,13 @@
 
 import React, { useState } from "react";
 import { ChevronIcon } from "@/icons/Chevron";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 // Animation variants
 const accordionContainerVariants = {
   layout: {
     duration: 0.3,
-    ease: [0.16, 1, 0.3, 1],
+    ease: [0.16, 1, 0.3, 1] as const,
   },
 };
 
@@ -17,7 +17,7 @@ const accordionItemVariants = {
   animate: { opacity: 1, scale: 1 },
   transition: {
     duration: 0.2,
-    ease: [0.16, 1, 0.3, 1],
+    ease: [0.16, 1, 0.3, 1] as const,
   },
 };
 
@@ -26,7 +26,7 @@ const chevronVariants = {
   expanded: { rotate: 180 },
   transition: {
     duration: 0.2,
-    ease: [0.16, 1, 0.3, 1],
+    ease: [0.16, 1, 0.3, 1] as const,
   },
 };
 
@@ -35,7 +35,7 @@ const contentVariants = {
   expanded: { height: "auto", opacity: 1 },
   transition: {
     duration: 0.25,
-    ease: [0.04, 0.62, 0.23, 0.98],
+    ease: [0.04, 0.62, 0.23, 0.98] as const,
   },
 };
 
