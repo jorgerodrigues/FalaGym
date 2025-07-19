@@ -268,7 +268,7 @@ export const finalizeSessionWithElo = async (sessionId: string, userId: string) 
     }
 
     // Check minimum reviews
-    if (session._count.CardReviewLog < 3) {
+    if (session._count.CardReviewLog < SESSION_SYSTEM.MINIMUM_REVIEWS) {
       return {
         data: null,
         error: "insufficient-reviews"
