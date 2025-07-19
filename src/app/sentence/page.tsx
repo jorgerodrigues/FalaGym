@@ -156,11 +156,14 @@ export default function Page() {
     if (!selectedCardId) {
       return;
     }
+
+    handleNextSentence();
+
+    // Log the review in background - no need to wait
     logCard(0, {
-      onSuccess: () => {
-        handleNextSentence();
+      onError: (error) => {
+        console.error("Failed to log review:", error);
       },
-      onError: () => {},
     });
     return;
   };
@@ -169,11 +172,13 @@ export default function Page() {
     if (!selectedCardId) {
       return;
     }
+
+    handleNextSentence();
+
     logCard(5, {
-      onSuccess: () => {
-        handleNextSentence();
+      onError: (error) => {
+        console.error("Failed to log review:", error);
       },
-      onError: () => {},
     });
   };
 

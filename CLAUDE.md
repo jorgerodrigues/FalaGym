@@ -22,6 +22,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Tests are located in `src/features/card/logic/__tests__/`
 - Testing framework uses Vitest with jsdom environment
 
+### Writing code
+- Use TypeScript for type safety
+- Follow Next.js conventions for file structure
+- Use Tailwind CSS for styling
+- Do not use `any` type; prefer specific types. As a last resort use `unknown`
+- LEAVE ONLY NECESSARY COMMENTS. Code should be self-documenting.
+- Functions should be small and focused on a single task
+- Functions should be pure where possible
+- Unit tests should be written for all core logic
+- Functions should be commented with JSDoc style comments without declaring types.
+- Never delete tests unless speifically requested to do so.
+- Write only the code needed and nothing more. Avoid unnecessary complexity.
+- You may ask questions if you are unsure about the requirements or if you have suggestions for improvements.
+
 ## Project Architecture
 
 ### Tech Stack
