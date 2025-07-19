@@ -33,3 +33,8 @@ export const BOUNDS_SYSTEM = {
   EXPONENTIAL_MIN_DAMPENING_FACTOR: 0.05,
   QUADRATIC_EXPONENT: 2,
 } as const;
+
+export const SESSION_SYSTEM = {
+  TIMEOUT_HOURS: 2,
+  MINIMUM_REVIEWS: 3,
+} as const;
